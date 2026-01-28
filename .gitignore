@@ -1,0 +1,18 @@
+# Fichiers sensibles
+.env
+.devcontainer/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
