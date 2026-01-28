@@ -2,7 +2,7 @@
   "name": "Claude DevContainer - LLM Entreprise",
   "dockerComposeFile": "docker-compose.yml",
   "service": "devcontainer",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspace/claude-devcontainer",
 
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
@@ -27,17 +27,9 @@
     }
   },
 
-  "forwardPorts": [8082],
-
-  "postCreateCommand": "echo '✅ Dev container prêt. Configurez .env puis lancez le proxy.'",
-
-  "postStartCommand": "cd /workspace/claude-code-proxy && /root/.local/bin/uv sync",
+  "postCreateCommand": "echo '✅ Dev container prêt. Le proxy tourne sur http://proxy:8082'",
 
   "remoteEnv": {
-    "ANTHROPIC_BASE_URL": "http://localhost:8082"
-  },
-
-  "containerEnv": {
     "ANTHROPIC_BASE_URL": "http://proxy:8082"
   }
 }

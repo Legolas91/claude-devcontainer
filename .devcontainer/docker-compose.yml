@@ -4,14 +4,12 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ..:/workspace:cached
+      - ..:/workspace/claude-devcontainer:cached
       - ~/.ssh:/home/vscode/.ssh:ro
-    ports:
-      - "8082:8082"
     env_file:
       - .env
     environment:
-      - ANTHROPIC_BASE_URL=http://localhost:8082
+      - ANTHROPIC_BASE_URL=http://proxy:8082
     command: sleep infinity
 
   proxy:
