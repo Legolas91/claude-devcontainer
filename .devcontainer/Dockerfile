@@ -1,47 +1,113 @@
+# ==============================================================================
+# Claude DevContainer - Dockerfile
+# Dev container pour Claude Code avec proxy LLM entreprise
+# ==============================================================================
+
 FROM mcr.microsoft.com/devcontainers/python:3.13-bookworm
 
-# Métadonnées
-LABEL maintainer="votre-email@entreprise.com"
+# ------------------------------------------------------------------------------
+# Version pinning
+# ------------------------------------------------------------------------------
+ARG UV_VERSION=0.5.18
+ARG NODE_MAJOR=22
+ARG CLAUDE_CODE_VERSION=latest
+
+# ------------------------------------------------------------------------------
+# Metadata
+# ------------------------------------------------------------------------------
+LABEL maintainer="philippe.dalessio@thalesgroup.com"
 LABEL description="Dev container pour Claude Code avec proxy LLM entreprise"
+LABEL version="1.0.0"
 
-# Variables d'environnement
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# ------------------------------------------------------------------------------
+# Shell configuration for safer scripts
+# ------------------------------------------------------------------------------
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Supprimer le repo Yarn (clé GPG expirée - bug connu Microsoft) puis installer dépendances
+# ------------------------------------------------------------------------------
+# Environment variables
+# ------------------------------------------------------------------------------
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# ------------------------------------------------------------------------------
+# Install system dependencies
+# ------------------------------------------------------------------------------
+# Remove problematic Yarn repository (known Microsoft bug)
+# Install essential tools: git, curl, ca-certificates
 RUN rm -f /etc/apt/sources.list.d/yarn.list \
-    && apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        git \
+        curl \
+        ca-certificates \
+        gnupg \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Installer uv (gestionnaire de paquets Python rapide)
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# ------------------------------------------------------------------------------
+# Install uv (Python package manager)
+# https://github.com/astral-sh/uv
+# ------------------------------------------------------------------------------
+RUN curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh \
+    && chmod +x /tmp/uv-install.sh \
+    && /tmp/uv-install.sh \
+    && rm -f /tmp/uv-install.sh
+
 ENV PATH="/root/.local/bin:$PATH"
 
-# Installer Node.js LTS pour Claude Code CLI
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
+# ------------------------------------------------------------------------------
+# Install Node.js LTS
+# https://github.com/nodesource/distributions
+# ------------------------------------------------------------------------------
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x -o /tmp/nodesource_setup.sh \
+    && chmod +x /tmp/nodesource_setup.sh \
+    && bash /tmp/nodesource_setup.sh \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Installer Claude Code CLI globalement
-RUN npm install -g @anthropic-ai/claude-code
+# ------------------------------------------------------------------------------
+# Install Claude Code CLI
+# https://www.npmjs.com/package/@anthropic-ai/claude-code
+# ------------------------------------------------------------------------------
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} \
+    && npm cache clean --force
 
-# Créer le répertoire de travail
+# ------------------------------------------------------------------------------
+# Setup workspace
+# ------------------------------------------------------------------------------
 WORKDIR /workspace
 
-# Cloner le projet claude-code-proxy
-RUN git clone https://github.com/1rgs/claude-code-proxy.git /workspace/claude-code-proxy
+# ------------------------------------------------------------------------------
+# Clone claude-code-proxy repository
+# https://github.com/1rgs/claude-code-proxy
+# ------------------------------------------------------------------------------
+RUN git clone --depth 1 https://github.com/1rgs/claude-code-proxy.git /workspace/claude-code-proxy
 
-# Installer les dépendances Python du proxy
+# ------------------------------------------------------------------------------
+# Install proxy dependencies
+# ------------------------------------------------------------------------------
 WORKDIR /workspace/claude-code-proxy
-RUN /root/.local/bin/uv sync
+RUN /root/.local/bin/uv sync \
+    && rm -rf /tmp/* /var/tmp/*
 
-# Revenir au workspace principal
+# ------------------------------------------------------------------------------
+# Return to main workspace
+# ------------------------------------------------------------------------------
 WORKDIR /workspace
 
-# Exposer le port du proxy
+# ------------------------------------------------------------------------------
+# Expose proxy port
+# ------------------------------------------------------------------------------
 EXPOSE 8082
 
-# Script de démarrage par défaut
+# ------------------------------------------------------------------------------
+# Health check (for proxy service)
+# ------------------------------------------------------------------------------
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8082/ || exit 1
+
+# ------------------------------------------------------------------------------
+# Default command
+# ------------------------------------------------------------------------------
 CMD ["bash"]

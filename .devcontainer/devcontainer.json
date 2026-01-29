@@ -14,22 +14,58 @@
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-python.debugpy",
-        "anthropics.claude-code",
+        "anthropic.claude-code",
         "redhat.vscode-yaml",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "eamodio.gitlens",
+        "editorconfig.editorconfig",
+        "esbenp.prettier-vscode",
+        "yzhang.markdown-all-in-one",
+        "streetsidesoftware.code-spell-checker"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",
         "python.formatting.provider": "black",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
         "editor.formatOnSave": true,
-        "terminal.integrated.defaultProfile.linux": "bash"
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.python",
+          "editor.formatOnSave": true
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": true
+        },
+        "[yaml]": {
+          "editor.defaultFormatter": "redhat.vscode-yaml",
+          "editor.formatOnSave": true
+        },
+        "[markdown]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
+          "editor.formatOnSave": false
+        },
+        "files.eol": "\n",
+        "files.insertFinalNewline": true,
+        "files.trimTrailingWhitespace": true
       }
     }
   },
 
-  "postCreateCommand": "echo '✅ Dev container prêt. Le proxy tourne sur http://proxy:8082'",
+  "postCreateCommand": "bash /workspace/claude-devcontainer/.devcontainer/scripts/setup-devcontainer.sh",
 
   "remoteEnv": {
-    "ANTHROPIC_BASE_URL": "http://proxy:8082"
+    "ANTHROPIC_BASE_URL": "http://proxy:8082",
+    "CLAUDE_DANGEROUSLY_SKIP_PERMISSIONS": "true",
+    "CLAUDE_OFFLINE_MODE": "true"
+  },
+
+  "containerEnv": {
+    "CLAUDE_DANGEROUSLY_SKIP_PERMISSIONS": "true",
+    "CLAUDE_OFFLINE_MODE": "true"
   }
 }
