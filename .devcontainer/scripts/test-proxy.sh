@@ -72,7 +72,7 @@ else
     fail "API ne répond pas: $RESPONSE"
 fi
 
-# Test 4: Requête via curl (Opus → mistral-large)
+# Test 4: Requête via curl (Opus → mistral-medium)
 echo ""
 echo "📋 Test 4: API directe - Opus"
 RESPONSE=$(curl -s -X POST "$PROXY_URL/v1/messages" \
@@ -86,7 +86,7 @@ RESPONSE=$(curl -s -X POST "$PROXY_URL/v1/messages" \
   }')
 
 if echo "$RESPONSE" | grep -q "content"; then
-    pass "Opus → mistral-large fonctionne"
+    pass "Opus → mistral-medium fonctionne"
     echo "   Réponse: $(echo $RESPONSE | jq -r '.content[0].text' 2>/dev/null | head -c 100)"
 else
     fail "API ne répond pas: $RESPONSE"

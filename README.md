@@ -39,7 +39,7 @@ OPENAI_BASE_URL=https://api.mammouth.ai/v1
 OPENAI_API_KEY=sk-votre-clé-mammouth-ici
 
 # Mapping des modèles Claude → Mistral/Codestral
-ANTHROPIC_DEFAULT_OPUS_MODEL=mistral-large-3
+ANTHROPIC_DEFAULT_OPUS_MODEL=mistral-medium-3.1
 ANTHROPIC_DEFAULT_SONNET_MODEL=codestral-2508
 ANTHROPIC_DEFAULT_HAIKU_MODEL=mistral-small-3.2-24b-instruct
 ```
