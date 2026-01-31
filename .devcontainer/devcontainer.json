@@ -20,7 +20,8 @@
         "editor.formatOnSave": true,
         "terminal.integrated.defaultProfile.linux": "bash",
         "terminal.integrated.env.linux": {
-          "ANTHROPIC_BASE_URL": "http://localhost:8082"
+          "ANTHROPIC_BASE_URL": "http://localhost:8082",
+          "ANTHROPIC_API_KEY": "proxy-local-key"
         },
         "files.eol": "\n",
         "files.insertFinalNewline": true,
@@ -36,7 +37,8 @@
   "postStartCommand": "start-proxy",
 
   "containerEnv": {
-    "ANTHROPIC_BASE_URL": "http://localhost:8082"
+    "ANTHROPIC_BASE_URL": "http://localhost:8082",
+    "ANTHROPIC_API_KEY": "proxy-local-key"
   },
 
   "remoteUser": "root"

@@ -30,6 +30,17 @@ alias dex='docker exec -it'
 alias dlogs='docker logs -f'
 
 # Claude Code aliases
+# Wrapper function to auto-save config after claude command
+claude() {
+    command claude "$@"
+    local exit_code=$?
+    # Save config to volume after each claude command
+    if [ -f /root/.claude.json ]; then
+        cp /root/.claude.json /root/.claude/claude.json 2>/dev/null || true
+    fi
+    return $exit_code
+}
+
 alias cc='claude'
 alias proxy-logs='cat /tmp/claude-code-proxy.log'
 alias proxy-status='curl -s http://localhost:8082/ | jq'

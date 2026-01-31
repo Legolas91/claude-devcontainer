@@ -24,6 +24,39 @@ if [ -f /workspace/claude-devcontainer/.devcontainer/.bash_aliases ]; then
 fi
 
 # ==============================================================================
+# Auto-save Claude config on shell exit
+# ==============================================================================
+if ! grep -q "claude.json backup trap" ~/.bashrc; then
+    echo "" >> ~/.bashrc
+    echo "# Auto-save Claude config to volume on exit" >> ~/.bashrc
+    echo "# claude.json backup trap" >> ~/.bashrc
+    echo 'trap '\''if [ -f /root/.claude.json ]; then cp /root/.claude.json /root/.claude/claude.json 2>/dev/null || true; fi'\'' EXIT' >> ~/.bashrc
+    echo "✅ Sauvegarde automatique configurée"
+fi
+
+# ==============================================================================
+# Configure Claude CLI - Restore config from volume
+# ==============================================================================
+echo "🔧 Configuration Claude CLI..."
+
+# If no config in volume, use template
+if [ ! -f /root/.claude/claude.json ]; then
+    if [ -f /root/.claude/claude.json.template ]; then
+        echo "📋 Utilisation du template de configuration..."
+        cp /root/.claude/claude.json.template /root/.claude/claude.json
+    fi
+fi
+
+# Always restore config from volume to /root (overwrites symlink if exists)
+if [ -f /root/.claude/claude.json ]; then
+    echo "📥 Restauration de la configuration depuis le volume..."
+    cp /root/.claude/claude.json /root/.claude.json
+    echo "✅ Configuration restaurée"
+else
+    echo "⚠️  Aucune configuration trouvée - l'authentification sera demandée"
+fi
+
+# ==============================================================================
 # Display info
 # ==============================================================================
 echo ""

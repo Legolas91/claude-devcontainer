@@ -1,0 +1,6 @@
+# Ignorer tous les fichiers de runtime Claude
+*
+!.gitignore
+
+# Garder uniquement le template de configuration
+!claude.json.template

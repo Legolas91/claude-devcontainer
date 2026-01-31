@@ -49,11 +49,6 @@ COPY bin/claude-code-proxy /usr/local/bin/claude-code-proxy
 RUN chmod +x /usr/local/bin/claude-code-proxy
 
 # ------------------------------------------------------------------------------
-# Copy proxy configuration
-# ------------------------------------------------------------------------------
-COPY .env /root/.claude/proxy.env
-
-# ------------------------------------------------------------------------------
 # Copy proxy scripts
 # ------------------------------------------------------------------------------
 COPY scripts/*.sh /usr/local/bin/proxy-scripts/
