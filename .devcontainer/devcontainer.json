@@ -11,7 +11,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "anthropics.claude-code",
+        "anthropic.claude-code",
         "redhat.vscode-yaml",
         "ms-azuretools.vscode-docker",
         "eamodio.gitlens"
@@ -31,7 +31,7 @@
 
   "forwardPorts": [8082],
 
-  "postCreateCommand": "echo '✅ Container créé. Utilisez start-proxy pour démarrer le proxy.'",
+  "postCreateCommand": "bash /workspace/claude-devcontainer/.devcontainer/scripts/setup-devcontainer.sh",
 
   "postStartCommand": "start-proxy",
 

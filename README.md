@@ -48,6 +48,8 @@ ANTHROPIC_DEFAULT_HAIKU_MODEL=mistral-small-3.2-24b-instruct
 
 Le proxy démarre automatiquement avec le container. Claude Code est pré-configuré pour l'utiliser.
 
+### Depuis le devcontainer
+
 ```bash
 # Utiliser Claude Code directement
 claude
@@ -57,8 +59,18 @@ start-proxy   # Démarrer le proxy
 stop-proxy    # Arrêter le proxy
 test-proxy    # Tester le proxy
 
+# Lancer les tests complets
+./test-devcontainer.sh
+
 # Vérifier le statut du proxy
 curl http://localhost:8082/
+```
+
+### Depuis l'hôte (Windows)
+
+```powershell
+# Lancer les tests complets (build + test + cleanup)
+.\test-devcontainer.ps1
 ```
 
 ## Architecture
