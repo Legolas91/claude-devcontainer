@@ -11,43 +11,16 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "ms-python.debugpy",
-        "anthropic.claude-code",
+        "anthropics.claude-code",
         "redhat.vscode-yaml",
         "ms-azuretools.vscode-docker",
-        "eamodio.gitlens",
-        "editorconfig.editorconfig",
-        "esbenp.prettier-vscode",
-        "yzhang.markdown-all-in-one",
-        "streetsidesoftware.code-spell-checker"
+        "eamodio.gitlens"
       ],
       "settings": {
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.formatting.provider": "black",
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
         "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-          "source.organizeImports": "explicit"
-        },
         "terminal.integrated.defaultProfile.linux": "bash",
-        "[python]": {
-          "editor.defaultFormatter": "ms-python.python",
-          "editor.formatOnSave": true
-        },
-        "[json]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode",
-          "editor.formatOnSave": true
-        },
-        "[yaml]": {
-          "editor.defaultFormatter": "redhat.vscode-yaml",
-          "editor.formatOnSave": true
-        },
-        "[markdown]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode",
-          "editor.formatOnSave": false
+        "terminal.integrated.env.linux": {
+          "ANTHROPIC_BASE_URL": "http://localhost:8082"
         },
         "files.eol": "\n",
         "files.insertFinalNewline": true,
@@ -56,16 +29,15 @@
     }
   },
 
-  "postCreateCommand": "bash /workspace/claude-devcontainer/.devcontainer/scripts/setup-devcontainer.sh",
+  "forwardPorts": [8082],
 
-  "remoteEnv": {
-    "ANTHROPIC_BASE_URL": "http://proxy:8082",
-    "CLAUDE_DANGEROUSLY_SKIP_PERMISSIONS": "true",
-    "CLAUDE_OFFLINE_MODE": "true"
-  },
+  "postCreateCommand": "echo '✅ Container créé. Utilisez start-proxy pour démarrer le proxy.'",
+
+  "postStartCommand": "start-proxy",
 
   "containerEnv": {
-    "CLAUDE_DANGEROUSLY_SKIP_PERMISSIONS": "true",
-    "CLAUDE_OFFLINE_MODE": "true"
-  }
+    "ANTHROPIC_BASE_URL": "http://localhost:8082"
+  },
+
+  "remoteUser": "root"
 }

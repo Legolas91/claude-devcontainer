@@ -11,7 +11,7 @@
 ### 1. Container Security
 
 - **Base Images**: Using official Microsoft DevContainer images
-- **No Root User**: Container runs as `vscode` user (non-root)
+- **Root User**: Container runs as `root` for proxy management
 - **Minimal Attack Surface**: Only necessary tools installed
 - **Read-only Mounts**: SSH keys mounted as read-only
 
@@ -23,39 +23,27 @@
 
 ### 3. Network Security
 
-- **Internal Network**: Containers communicate via Docker network
-- **Minimal Port Exposure**: Only proxy port 8083 exposed to host
+- **Single Container**: Proxy runs inside the same container
+- **Minimal Port Exposure**: Only proxy port 8082 exposed to host
 - **No Direct Internet**: Proxy mediates all LLM API calls
 
 ### 4. Dependency Management
 
-- **Version Pinning**: ✅ Versions pinned with ARG variables in Dockerfile
-- **SHA256 Verification**: ⚠️ Partial - Some binaries verified
-- **Minimal Dependencies**: Only essential packages installed
+- **Go Proxy Binary**: ✅ Pre-compiled binary, no runtime dependencies
+- **Minimal Dependencies**: Only essential packages installed (curl, jq, nodejs)
 - **No Piped Installs**: ✅ Download then execute (safer)
-
-### 5. Code Quality
-
-- **Linting**: Python code linted with `pylint` and `black`
-- **Editor Config**: Consistent formatting via EditorConfig
-- **Spell Checking**: Code spell checker enabled
 
 ## Known Limitations
 
 ### Current State
 
-1. ✅ **Version Pinning**: Tool versions pinned with ARG (uv, Node.js)
-2. ⚠️ **SHA256 Checks**: Partial implementation (needs completion)
-3. **No Image Scanning**: Docker images not scanned for vulnerabilities
-4. ✅ **No Piped Installs**: Downloads saved then executed
-5. ✅ **Shell Safety**: SHELL with pipefail configured
+1. ✅ **Go Proxy Binary**: Pre-compiled, statically linked, no runtime dependencies
+2. **No Image Scanning**: Docker images not scanned for vulnerabilities
+3. ✅ **Minimal Dependencies**: Only curl, jq, nodejs installed
 
 ### Planned Improvements
 
-- [x] Add version pinning with ARG variables
-- [x] Remove piped bash installations
-- [x] Add SHELL with pipefail
-- [ ] Complete SHA256 verification for all downloads
+- [x] Use pre-compiled Go proxy (no runtime dependencies)
 - [ ] Implement Hadolint for Dockerfile linting
 - [ ] Add Trivy for container scanning
 
@@ -76,37 +64,25 @@ If you discover a security vulnerability:
 2. **Review mounted volumes**: Understand what's shared with container
 3. **Use read-only mounts**: For sensitive data like SSH keys
 4. **Rotate API keys**: Periodically change LLM API keys
-5. **Monitor proxy logs**: Check for suspicious activity
+5. **Monitor proxy logs**: Check for suspicious activity (`cat /tmp/claude-code-proxy.log`)
 
 ### For Developers
 
 1. **Review dependencies**: Before adding new packages
-2. **Use specific versions**: Pin versions in requirements
-3. **Run linters**: Before committing code
-4. **Check `.dockerignore`**: Prevent sensitive files in images
-5. **Test in isolation**: Use separate test API keys
+2. **Check `.dockerignore`**: Prevent sensitive files in images
+3. **Test in isolation**: Use separate test API keys
 
 ## Security Tools
-
-### Available
-
-- **Black**: Python code formatter
-- **Pylint**: Python linter
-- **Prettier**: JSON/YAML formatter
-- **EditorConfig**: Consistent file formatting
 
 ### Recommended (TODO)
 
 - **Hadolint**: Dockerfile linter
 - **Trivy**: Container vulnerability scanner
-- **Bandit**: Python security linter
-- **Safety**: Python dependency security checker
 
 ## Compliance
 
 This project follows security best practices for:
 - Docker container development
-- Python development
 - DevContainer specifications
 - Secrets management
 

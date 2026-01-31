@@ -1,0 +1,45 @@
+# ==============================================================================
+# .dockerignore - Files to exclude from Docker build context
+# ==============================================================================
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# CI/CD
+.github
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation (keep README)
+*.md
+!README.md
+docs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Example files (keep .env for proxy config)
+.env.example

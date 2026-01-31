@@ -29,16 +29,12 @@ alias di='docker images'
 alias dex='docker exec -it'
 alias dlogs='docker logs -f'
 
-# Python aliases
-alias py='python'
-alias pip='python -m pip'
-alias venv='python -m venv'
-
 # Claude Code aliases
-alias claude-proxy='cd /workspace/claude-code-proxy && uv run uvicorn server:app --host 0.0.0.0 --port 8082'
-alias c='claude --dangerously-skip-permissions'
+alias cc='claude'
+alias proxy-logs='cat /tmp/claude-code-proxy.log'
+alias proxy-status='curl -s http://localhost:8082/ | jq'
 
 # Utility aliases
 alias h='history'
-alias c='clear'
+alias cls='clear'
 alias reload='source ~/.bashrc'

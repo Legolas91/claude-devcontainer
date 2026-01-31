@@ -3,109 +3,76 @@
 # Dev container pour Claude Code avec proxy LLM entreprise
 # ==============================================================================
 
-FROM mcr.microsoft.com/devcontainers/python:3.13-bookworm
-
-# ------------------------------------------------------------------------------
-# Version pinning
-# ------------------------------------------------------------------------------
-ARG UV_VERSION=0.5.18
-ARG NODE_MAJOR=22
-ARG CLAUDE_CODE_VERSION=latest
+FROM mcr.microsoft.com/devcontainers/base:bookworm
 
 # ------------------------------------------------------------------------------
 # Metadata
 # ------------------------------------------------------------------------------
 LABEL maintainer="philippe.dalessio@thalesgroup.com"
 LABEL description="Dev container pour Claude Code avec proxy LLM entreprise"
-LABEL version="1.0.0"
-
-# ------------------------------------------------------------------------------
-# Shell configuration for safer scripts
-# ------------------------------------------------------------------------------
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-
-# ------------------------------------------------------------------------------
-# Environment variables
-# ------------------------------------------------------------------------------
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    DEBIAN_FRONTEND=noninteractive
+LABEL version="2.0.0"
 
 # ------------------------------------------------------------------------------
 # Install system dependencies
 # ------------------------------------------------------------------------------
-# Remove problematic Yarn repository (known Microsoft bug)
-# Install essential tools: git, curl, ca-certificates
-RUN rm -f /etc/apt/sources.list.d/yarn.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        git \
-        curl \
-        ca-certificates \
-        gnupg \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    jq \
+    procps \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------------------------
-# Install uv (Python package manager)
-# https://github.com/astral-sh/uv
+# Install Node.js LTS for Claude Code CLI
 # ------------------------------------------------------------------------------
-RUN curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh \
-    && chmod +x /tmp/uv-install.sh \
-    && /tmp/uv-install.sh \
-    && rm -f /tmp/uv-install.sh
-
-ENV PATH="/root/.local/bin:$PATH"
-
-# ------------------------------------------------------------------------------
-# Install Node.js LTS
-# https://github.com/nodesource/distributions
-# ------------------------------------------------------------------------------
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x -o /tmp/nodesource_setup.sh \
-    && chmod +x /tmp/nodesource_setup.sh \
-    && bash /tmp/nodesource_setup.sh \
-    && apt-get install -y --no-install-recommends nodejs \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------------------------
 # Install Claude Code CLI
-# https://www.npmjs.com/package/@anthropic-ai/claude-code
 # ------------------------------------------------------------------------------
-RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} \
+RUN npm install -g @anthropic-ai/claude-code \
     && npm cache clean --force
 
 # ------------------------------------------------------------------------------
-# Setup workspace
+# Setup directories
 # ------------------------------------------------------------------------------
 WORKDIR /workspace
+RUN mkdir -p /root/.claude /usr/local/bin/proxy-scripts
 
 # ------------------------------------------------------------------------------
-# Clone claude-code-proxy repository
-# https://github.com/1rgs/claude-code-proxy
+# Copy and install proxy binary (pre-compiled for Linux)
 # ------------------------------------------------------------------------------
-RUN git clone --depth 1 https://github.com/1rgs/claude-code-proxy.git /workspace/claude-code-proxy
+COPY bin/claude-code-proxy /usr/local/bin/claude-code-proxy
+RUN chmod +x /usr/local/bin/claude-code-proxy
 
 # ------------------------------------------------------------------------------
-# Install proxy dependencies
+# Copy proxy configuration
 # ------------------------------------------------------------------------------
-WORKDIR /workspace/claude-code-proxy
-RUN /root/.local/bin/uv sync \
-    && rm -rf /tmp/* /var/tmp/*
+COPY .env /root/.claude/proxy.env
 
 # ------------------------------------------------------------------------------
-# Return to main workspace
+# Copy proxy scripts
 # ------------------------------------------------------------------------------
-WORKDIR /workspace
+COPY scripts/*.sh /usr/local/bin/proxy-scripts/
+RUN chmod +x /usr/local/bin/proxy-scripts/*.sh
+
+# Create aliases for scripts
+RUN ln -sf /usr/local/bin/proxy-scripts/start-proxy.sh /usr/local/bin/start-proxy \
+    && ln -sf /usr/local/bin/proxy-scripts/stop-proxy.sh /usr/local/bin/stop-proxy \
+    && ln -sf /usr/local/bin/proxy-scripts/test-proxy.sh /usr/local/bin/test-proxy
+
+# ------------------------------------------------------------------------------
+# Environment variables
+# ------------------------------------------------------------------------------
+ENV ANTHROPIC_BASE_URL=http://localhost:8082
 
 # ------------------------------------------------------------------------------
 # Expose proxy port
 # ------------------------------------------------------------------------------
 EXPOSE 8082
-
-# ------------------------------------------------------------------------------
-# Health check (for proxy service)
-# ------------------------------------------------------------------------------
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8082/ || exit 1
 
 # ------------------------------------------------------------------------------
 # Default command

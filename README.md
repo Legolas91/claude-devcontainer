@@ -1,6 +1,6 @@
 # Claude DevContainer
 
-Dev container pour utiliser Claude Code avec des LLM d'entreprise (Mistral, Codestral) via un proxy.
+Dev container pour utiliser Claude Code avec des LLM d'entreprise (Mistral, Codestral) via un proxy Go.
 
 ## Prérequis
 
@@ -31,56 +31,33 @@ Dev container pour utiliser Claude Code avec des LLM d'entreprise (Mistral, Code
 
 ## Configuration
 
-### Phase Test 1 : Anthropic (validation)
-
-Pour valider que le proxy fonctionne, utilisez les modèles Claude natifs :
+Éditez `.devcontainer/.env` :
 
 ```env
-PREFERRED_PROVIDER="anthropic"
-ANTHROPIC_API_KEY="sk-ant-votre-clé"
-BIG_MODEL="claude-sonnet-4-20250514"
-SMALL_MODEL="claude-haiku-4-20250514"
-```
+# Provider Mammouth.ai
+OPENAI_BASE_URL=https://api.mammouth.ai/v1
+OPENAI_API_KEY=sk-votre-clé-mammouth-ici
 
-### Phase Test 2 : Mammouth.ai (LLM entreprise)
-
-Pour utiliser les modèles d'entreprise :
-
-```env
-PREFERRED_PROVIDER="openai"
-OPENAI_BASE_URL="https://api.mammouth.ai/v1"
-OPENAI_API_KEY="votre-clé-mammouth"
-BIG_MODEL="codestral-2508"
-SMALL_MODEL="mistral-small-3.2-24b-instruct"
+# Mapping des modèles Claude → Mistral/Codestral
+ANTHROPIC_DEFAULT_OPUS_MODEL=mistral-large-3
+ANTHROPIC_DEFAULT_SONNET_MODEL=codestral-2508
+ANTHROPIC_DEFAULT_HAIKU_MODEL=mistral-small-3.2-24b-instruct
 ```
 
 ## Utilisation
 
-### Démarrer le proxy
+Le proxy démarre automatiquement avec le container. Claude Code est pré-configuré pour l'utiliser.
 
 ```bash
-cd /workspace/claude-devcontainer
-uv run uvicorn server:app --host 0.0.0.0 --port 8082 --reload
-```
-
-### Utiliser Claude Code
-
-Dans un autre terminal :
-
-```bash
-# La variable ANTHROPIC_BASE_URL est déjà configurée
+# Utiliser Claude Code directement
 claude
-```
 
-Ou manuellement :
+# Commandes proxy
+start-proxy   # Démarrer le proxy
+stop-proxy    # Arrêter le proxy
+test-proxy    # Tester le proxy
 
-```bash
-ANTHROPIC_BASE_URL=http://localhost:8082 claude
-```
-
-### Vérifier le proxy
-
-```bash
+# Vérifier le statut du proxy
 curl http://localhost:8082/
 ```
 
@@ -88,29 +65,29 @@ curl http://localhost:8082/
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Claude Code    │────▶│  Proxy (8082)   │────▶│  Mammouth.ai    │
-│  CLI/VS Code    │     │  claude-code-   │     │  Mistral/       │
-│                 │◀────│  proxy          │◀────│  Codestral      │
+│  Claude Code    │────▶│  Proxy Go       │────▶│  Mammouth.ai    │
+│  CLI/VS Code    │     │  (localhost:    │     │  Mistral/       │
+│                 │◀────│   8082)         │◀────│  Codestral      │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
-## Phase 2 : Support 3 modèles (future)
+Le proxy traduit les requêtes Claude API → OpenAI API et inversement.
 
-Le proxy actuel supporte 2 modèles. Pour supporter les 3 modèles Claude :
+## Proxy
 
-| Modèle Claude | Variable | Modèle Mammouth.ai |
-|---------------|----------|-------------------|
-| Opus | `OPUS_MODEL` | `codestral-2508` |
-| Sonnet | `SONNET_MODEL` | `mistral-medium-2312` |
-| Haiku | `HAIKU_MODEL` | `mistral-small-3.2-24b-instruct` |
+Le proxy utilisé est [claude-code-proxy](https://github.com/nielspeter/claude-code-proxy) (Go).
 
-Cela nécessitera une modification de `server.py`.
+**Caractéristiques :**
+- Binaire unique ~8MB, zéro dépendances
+- Démarrage < 10ms
+- Support complet de Claude Code (tools, streaming, thinking blocks)
+- Détection adaptative par modèle
 
 ## Dépannage
 
 ### Le proxy ne démarre pas
 - Vérifiez que le fichier `.env` existe et est correctement configuré
-- Vérifiez les logs : `docker-compose logs proxy`
+- Vérifiez les logs : `cat /tmp/claude-code-proxy.log`
 
 ### Claude Code ne se connecte pas
 - Vérifiez que `ANTHROPIC_BASE_URL` pointe vers `http://localhost:8082`
