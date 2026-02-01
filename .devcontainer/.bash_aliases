@@ -35,8 +35,8 @@ claude() {
     command claude "$@"
     local exit_code=$?
     # Save config to volume after each claude command
-    if [ -f /root/.claude.json ]; then
-        cp /root/.claude.json /root/.claude/claude.json 2>/dev/null || true
+    if [ -f /home/claude-dev/.claude.json ]; then
+        cp /home/claude-dev/.claude.json /home/claude-dev/.claude/claude.json 2>/dev/null || true
     fi
     return $exit_code
 }

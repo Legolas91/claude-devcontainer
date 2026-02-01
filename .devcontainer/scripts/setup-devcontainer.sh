@@ -20,6 +20,15 @@ if [ -f /workspace/claude-devcontainer/.devcontainer/.bash_aliases ]; then
         echo "    source ~/.bash_aliases" >> ~/.bashrc
         echo "fi" >> ~/.bashrc
     fi
+    # Add source to .zshrc as well
+    if [ -f ~/.zshrc ] && ! grep -q "source ~/.bash_aliases" ~/.zshrc; then
+        echo "" >> ~/.zshrc
+        echo "# Source custom aliases" >> ~/.zshrc
+        echo "if [ -f ~/.bash_aliases ]; then" >> ~/.zshrc
+        echo "    source ~/.bash_aliases" >> ~/.zshrc
+        echo "fi" >> ~/.zshrc
+    fi
+
     echo "✅ Alias bash installés"
 fi
 
@@ -30,7 +39,7 @@ if ! grep -q "claude.json backup trap" ~/.bashrc; then
     echo "" >> ~/.bashrc
     echo "# Auto-save Claude config to volume on exit" >> ~/.bashrc
     echo "# claude.json backup trap" >> ~/.bashrc
-    echo 'trap '\''if [ -f /root/.claude.json ]; then cp /root/.claude.json /root/.claude/claude.json 2>/dev/null || true; fi'\'' EXIT' >> ~/.bashrc
+    echo 'trap '\''if [ -f /home/claude-dev/.claude.json ]; then cp /home/claude-dev/.claude.json /home/claude-dev/.claude/claude.json 2>/dev/null || true; fi'\'' EXIT' >> ~/.bashrc
     echo "✅ Sauvegarde automatique configurée"
 fi
 
@@ -40,17 +49,17 @@ fi
 echo "🔧 Configuration Claude CLI..."
 
 # If no config in volume, use template
-if [ ! -f /root/.claude/claude.json ]; then
-    if [ -f /root/.claude/claude.json.template ]; then
+if [ ! -f /home/claude-dev/.claude/claude.json ]; then
+    if [ -f /home/claude-dev/.claude/claude.json.template ]; then
         echo "📋 Utilisation du template de configuration..."
-        cp /root/.claude/claude.json.template /root/.claude/claude.json
+        cp /home/claude-dev/.claude/claude.json.template /home/claude-dev/.claude/claude.json
     fi
 fi
 
-# Always restore config from volume to /root (overwrites symlink if exists)
-if [ -f /root/.claude/claude.json ]; then
+# Always restore config from volume to /home/claude-dev (overwrites symlink if exists)
+if [ -f /home/claude-dev/.claude/claude.json ]; then
     echo "📥 Restauration de la configuration depuis le volume..."
-    cp /root/.claude/claude.json /root/.claude.json
+    cp /home/claude-dev/.claude/claude.json /home/claude-dev/.claude.json
     echo "✅ Configuration restaurée"
 else
     echo "⚠️  Aucune configuration trouvée - l'authentification sera demandée"

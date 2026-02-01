@@ -5,8 +5,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ..:/workspace/claude-devcontainer:cached
-      - ~/.ssh:/home/vscode/.ssh:ro
-      - ./.claude:/root/.claude
+      - ~/.ssh:/home/claude-dev/.ssh:ro
+      - ./.claude:/home/claude-dev/.claude
     ports:
       - "8082:8082"
     env_file:

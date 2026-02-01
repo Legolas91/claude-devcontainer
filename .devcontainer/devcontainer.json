@@ -4,6 +4,15 @@
   "service": "devcontainer",
   "workspaceFolder": "/workspace/claude-devcontainer",
 
+  "runArgs": [
+    "--cap-add=NET_ADMIN",
+    "--cap-add=NET_RAW"
+  ],
+
+  "mounts": [
+    "source=claude-code-bashhistory,target=/commandhistory,type=volume"
+  ],
+
   "features": {
     "ghcr.io/devcontainers/features/git:1": {}
   },
@@ -12,13 +21,28 @@
     "vscode": {
       "extensions": [
         "anthropic.claude-code",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
         "redhat.vscode-yaml",
         "ms-azuretools.vscode-docker",
         "eamodio.gitlens"
       ],
       "settings": {
         "editor.formatOnSave": true,
-        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+          },
+          "zsh": {
+            "path": "zsh"
+          }
+        },
         "terminal.integrated.env.linux": {
           "ANTHROPIC_BASE_URL": "http://localhost:8082",
           "ANTHROPIC_API_KEY": "proxy-local-key"
@@ -34,12 +58,17 @@
 
   "postCreateCommand": "bash /workspace/claude-devcontainer/.devcontainer/scripts/setup-devcontainer.sh",
 
-  "postStartCommand": "start-proxy",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh && start-proxy",
+
+  "waitFor": "postStartCommand",
 
   "containerEnv": {
+    "NODE_OPTIONS": "--max-old-space-size=4096",
     "ANTHROPIC_BASE_URL": "http://localhost:8082",
-    "ANTHROPIC_API_KEY": "proxy-local-key"
+    "ANTHROPIC_API_KEY": "proxy-local-key",
+    "CLAUDE_CONFIG_DIR": "/home/claude-dev/.claude",
+    "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
   },
 
-  "remoteUser": "root"
+  "remoteUser": "claude-dev"
 }
