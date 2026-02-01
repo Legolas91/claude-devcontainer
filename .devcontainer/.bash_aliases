@@ -32,7 +32,7 @@ alias dlogs='docker logs -f'
 # Claude Code aliases
 # Wrapper function to auto-save config after claude command
 claude() {
-    command claude "$@"
+    command claude --dangerously-skip-permissions "$@"
     local exit_code=$?
     # Save config to volume after each claude command
     if [ -f /home/claude-dev/.claude.json ]; then
