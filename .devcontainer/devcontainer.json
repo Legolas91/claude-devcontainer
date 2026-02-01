@@ -58,7 +58,7 @@
 
   "postCreateCommand": "bash /workspace/claude-devcontainer/.devcontainer/scripts/setup-devcontainer.sh",
 
-  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh && start-proxy",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh || echo 'Firewall non disponible (Docker Desktop limitation)'; start-proxy",
 
   "waitFor": "postStartCommand",
 
