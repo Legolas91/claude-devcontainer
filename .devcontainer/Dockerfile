@@ -85,7 +85,7 @@ RUN usermod -l claude-dev vscode \
     && usermod -s /bin/zsh claude-dev \
     && mkdir -p /home/claude-dev/.claude /commandhistory \
     && chown -R claude-dev:claude-dev /home/claude-dev /commandhistory \
-    && echo "claude-dev ALL=(ALL) NOPASSWD: /usr/local/bin/init-firewall.sh" > /etc/sudoers.d/claude-dev \
+    && echo "claude-dev ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/claude-dev \
     && chmod 0440 /etc/sudoers.d/claude-dev
 
 # ------------------------------------------------------------------------------
