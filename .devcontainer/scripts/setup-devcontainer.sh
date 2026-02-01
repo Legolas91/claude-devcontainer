@@ -6,6 +6,12 @@ set -e
 echo "🚀 Claude DevContainer setup..."
 
 # ==============================================================================
+# Fix permissions for mounted volume
+# ==============================================================================
+sudo chown -R claude-dev:claude-dev /home/claude-dev/.claude 2>/dev/null || true
+sudo chmod -R u+w /home/claude-dev/.claude 2>/dev/null || true
+
+# ==============================================================================
 # Install bash aliases
 # ==============================================================================
 if [ -f /workspace/claude-devcontainer/.devcontainer/.bash_aliases ]; then
