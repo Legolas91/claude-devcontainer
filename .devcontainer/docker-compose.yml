@@ -14,4 +14,5 @@ services:
     environment:
       - ANTHROPIC_BASE_URL=http://localhost:8082
       - ANTHROPIC_API_KEY=${OPENAI_API_KEY}
+      - DEVCONTAINER_HOSTNAME=${COMPUTERNAME}
     command: sleep infinity
