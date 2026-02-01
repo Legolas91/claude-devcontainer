@@ -39,6 +39,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gh \
     locales \
     tzdata \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------------------------

@@ -2,5 +2,7 @@
 *
 !.gitignore
 
-# Garder uniquement le template de configuration
+# Garder uniquement le template de configuration et scripts
 !claude.json.template
+!statusline.py
+!settings.json

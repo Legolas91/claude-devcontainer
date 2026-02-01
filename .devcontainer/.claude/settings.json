@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "defaultMode": "default"
+  },
+  "model": "sonnet",
+  "statusLine": {
+    "type": "command",
+    "command": "python3 /home/claude-dev/.claude/statusline.py"
+  },
+  "enabledPlugins": {},
+  "autoUpdatesChannel": "latest"
+}
